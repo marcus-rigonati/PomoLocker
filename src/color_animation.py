@@ -78,38 +78,3 @@ def animate_bg_change(widget, end_color, style=None, property_to_change="backgro
         widget.after(delay, step_animation)
 
     step_animation()
-
-# root = tk.Tk()
-# root.geometry("500x500")
-# root.resizable(True, True)
-# root.minsize(400, 200)
-# root.maxsize(1000, 1000)
-# root.grid_rowconfigure(0, weight=1)
-# root.grid_rowconfigure(2, weight=1)
-# root.grid_columnconfigure(0, weight=1)
-# root.config(background="#b5625f")
-#
-# style = ttk.Style()
-# style.theme_use('clam')
-# style.configure(
-#     'Red.TButton',
-#     background="#7d7d7d",
-#     foreground='white',
-#     borderwidth=1,
-#     font=('Arial', 12, "bold"),
-#     bordercolor='white',
-#     focusthickness=0,
-#     focuscolor='none',
-# )
-# button_1 = ttk.Button(root, width=10, text="Test", style="Red.TButton")
-# button_1.grid(row=0, column=0)
-#
-# def on_button_click():
-#     animate_bg_change(button, "#ffffff", style)
-#     animate_bg_change(root, "#ffffff")
-#
-# button = ttk.Button(root, width=10, text="Fade", style="Red.TButton", command=on_button_click)
-# button.grid(row=1, column=0)
-#
-#
-# root.mainloop()

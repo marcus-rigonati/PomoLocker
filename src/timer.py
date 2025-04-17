@@ -1,6 +1,6 @@
 from text_handler import *
 from tkinter import messagebox
-from test_color_fade import animate_bg_change
+from color_animation import animate_bg_change
 from run_shell_command import run_shell_command
 
 class Timer:
@@ -30,10 +30,7 @@ class Timer:
 
         if self.remaining_seconds > 0:
             self.remaining_seconds -= 1
-            # Temporarily disable trace formatting during programmatic update
-            self.is_formatting = True
-            self.timer_var.set(format_time(self.remaining_seconds))
-            self.is_formatting = False
+            self.timer_entry_manager.safe_set(format_time(self.remaining_seconds))
             self.after_id = self.window.after(1000, self.countdown_loop)
         else:
             # Timer reached zero
@@ -43,19 +40,12 @@ class Timer:
             self.is_timer_running = False
             self.timer_entry.config(state='normal') # Make editable again
             self.after_id = None
-            # Keep displaying 00:00:00
-            self.is_formatting = True
-            self.timer_var.set(format_time(0))
-            self.is_formatting = False
 
     def start_timer(self):
         if self.is_timer_running:
             print("Timer is already running.")
             return
 
-        # Ensure the displayed value matches the format before parsing
-        # (e.g., user typed "1" which became "01", use "00:00:01")
-        # A simple way is to force re-format just before parsing
         current_seconds = self.timer_entry_manager.get_time_formatted()
 
         if current_seconds is not None and current_seconds > 0:
@@ -69,7 +59,6 @@ class Timer:
         elif current_seconds == 0:
             messagebox.showwarning("Timer Start", "Cannot start timer from 00:00:00.")
         else:
-            # Handle cases where input is incomplete (e.g., "12:34") or invalid
             messagebox.showerror("Timer Start", f"Invalid or incomplete time.\nPlease enter time as HH:MM:SS.")
 
     def stop_timer(self):
