@@ -44,6 +44,13 @@ timer_entry.pack(pady=20, padx=10, fill='x')
 
 timer_entry_manager = TimerEntryManager(timer_var, timer_entry)
 
+def change_background_colors(window_color, others_color):
+    animate_bg_change(window, window_color)
+    animate_bg_change(parent_frame, others_color)
+    animate_bg_change(timer_entry, others_color)
+    animate_bg_change(timer_entry, others_color, property_to_change="readonlybackground")
+    animate_bg_change(button, others_color, style)
+
 def countdown_loop():
     global remaining_seconds, is_timer_running, after_id, is_formatting
 
@@ -60,6 +67,7 @@ def countdown_loop():
     else:
         # Timer reached zero
         print("TIMER FINISHED!")
+        change_background_colors("#ad504d", "#b5625f")
         run_shell_command("/usr/bin/pmset displaysleepnow")
         is_timer_running = False
         timer_entry.config(state='normal') # Make editable again
@@ -90,11 +98,7 @@ def start_timer():
         remaining_seconds = parsed_seconds
         is_timer_running = True
         timer_entry.config(state='readonly')
-        animate_bg_change(window, "#474747")
-        animate_bg_change(parent_frame, "#373737")
-        animate_bg_change(timer_entry, "#373737")
-        animate_bg_change(timer_entry, "#373737", property_to_change="readonlybackground")
-        animate_bg_change(button, "#373737", style)
+        change_background_colors("#474747", "#373737")
         button_text.set("Stop")
         print(f"Timer started from {format_time(remaining_seconds)}.")
         countdown_loop() # Start the countdown
@@ -111,11 +115,7 @@ def stop_timer():
         if after_id:
             window.after_cancel(after_id)
             after_id = None
-        animate_bg_change(window, "#ad504d")
-        animate_bg_change(parent_frame, "#b5625f")
-        animate_bg_change(timer_entry, "#b5625f")
-        animate_bg_change(timer_entry, "#b5625f", property_to_change="readonlybackground")
-        animate_bg_change(button, "#b5625f", style)
+        change_background_colors("#ad504d", "#b5625f")
         timer_entry.config(state='normal')
         button_text.set("Start")
     else:
