@@ -11,7 +11,7 @@ APP_NAME = "PomoLocker"
 DATA_FILES = []
 
 OPTIONS = {
-    'excludes': ['setuptools'],
+    'excludes': ['setuptools', 'macholib', 'modulegraph'],
     'argv_emulation': False,
     'iconfile': 'appicon.icns',
     'plist': { # Optional: Add macOS specific metadata
