@@ -58,8 +58,6 @@ class Timer:
             self.countdown_loop() # Start the countdown
         elif current_seconds == 0:
             messagebox.showwarning("Timer Start", "Cannot start timer from 00:00:00.")
-        else:
-            messagebox.showerror("Timer Start", f"Invalid or incomplete time.\nPlease enter time as HH:MM:SS.")
 
     def stop_timer(self):
         if self.is_timer_running:

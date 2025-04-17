@@ -36,14 +36,15 @@ class TimerEntryManager:
         formatted_str = ""
         len_digits = len(digits)
 
-        if len_digits > 4:
-            # HH:MM:S... or HH:MM:SS
+        if len_digits == 6: # HH:MM:SS
             formatted_str = f"{digits[:2]}:{digits[2:4]}:{digits[4:]}"
-        elif len_digits > 2:
-            # HH:M... or HH:MM
+        elif len_digits == 5: # H:MM:SS
+            formatted_str = f"{digits[:1]}:{digits[1:3]}:{digits[3:]}"
+        elif len_digits == 4: # MM:SS
             formatted_str = f"{digits[:2]}:{digits[2:]}"
-        else:
-            # H or HH or empty
+        elif len_digits == 3: # M:SS
+            formatted_str = f"{digits[:1]}:{digits[1:]}"
+        else: # S or SS or empty
             formatted_str = digits
 
         # Update the entry only if the formatted string is different
