@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="archivetestdata">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/bdist.macosx-15.0-arm64/python3.13-standalone/app/collect/test/archivetestdata/zip_cp437_header.zip!/" />
+      <root url="jar://$PROJECT_DIR$/build/bdist.macosx-15.0-arm64/python3.13-standalone/app/collect/test/archivetestdata/zipdir.zip!/" />
+      <root url="jar://$PROJECT_DIR$/build/bdist.macosx-15.0-arm64/python3.13-standalone/app/collect/test/archivetestdata/zipdir_backslash.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
