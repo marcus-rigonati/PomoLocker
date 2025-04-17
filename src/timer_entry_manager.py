@@ -1,5 +1,6 @@
 import tkinter
 import re
+from text_handler import parse_time_string
 
 class TimerEntryManager:
     def __init__(self, string_var: tkinter.StringVar, entry_widget: tkinter.Entry):
@@ -90,3 +91,8 @@ class TimerEntryManager:
     def format_now(self):
         """ Manually triggers the formatting logic once. """
         self.format_on_change()
+
+    def get_time_formatted(self):
+        self.format_now()
+        result = self.timer_var.get()
+        return parse_time_string(result)
