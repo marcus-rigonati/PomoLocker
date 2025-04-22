@@ -1,5 +1,6 @@
 from text_handler import *
 from tkinter import messagebox
+from src.focus_manager import focus_app
 from color_animation import animate_bg_change
 from run_shell_command import run_shell_command
 
@@ -36,6 +37,7 @@ class Timer:
             # Timer reached zero
             print("TIMER FINISHED!")
             self.change_background_colors("#ad504d", "#b5625f")
+            focus_app()
             run_shell_command("/usr/bin/pmset displaysleepnow")
             self.is_timer_running = False
             self.timer_entry.config(state='normal') # Make editable again
