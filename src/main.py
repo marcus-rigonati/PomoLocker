@@ -72,6 +72,7 @@ timer_entry.bindtags(((str(timer_entry)), "Entry", "post-processing", ".", "all"
 timer_entry.bind_class("post-processing", "<KeyPress>", timer_entry_manager.format_on_change)
 # Add callback for the Return key (Start/Stop timer)
 window.bind_all("<Return>", timer.start_stop)
+window.bind_all("<space>", timer.start_stop)
 
 # Start the Tkinter event loop (keeps the window open)
 window.mainloop()
