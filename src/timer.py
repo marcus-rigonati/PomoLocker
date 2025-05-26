@@ -37,6 +37,7 @@ class Timer:
             # Timer reached zero
             print("TIMER FINISHED!")
             self.change_background_colors("#ad504d", "#b5625f")
+            self.window.deiconify()
             focus_app()
             run_shell_command("/usr/bin/pmset displaysleepnow")
             self.is_timer_running = False

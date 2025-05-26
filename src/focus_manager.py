@@ -3,7 +3,6 @@ import subprocess
 import os
 import sys
 
-# --- Paste the focus_app function from the previous answer here ---
 def focus_app():
     """
     Brings the current Python application to the foreground on macOS.
@@ -24,4 +23,3 @@ def focus_app():
         print("Error: 'osascript' command not found.", file=sys.stderr)
     except Exception as e:
         print(f"An unexpected error occurred: {e}", file=sys.stderr)
-# --- End of focus_app function ---

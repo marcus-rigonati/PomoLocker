@@ -74,5 +74,8 @@ timer_entry.bind_class("post-processing", "<KeyPress>", timer_entry_manager.form
 window.bind_all("<Return>", timer.start_stop)
 window.bind_all("<space>", timer.start_stop)
 
+# Bring app back from minimized state
+window.createcommand('tk::mac::ReopenApplication', window.deiconify)
+
 # Start the Tkinter event loop (keeps the window open)
 window.mainloop()
