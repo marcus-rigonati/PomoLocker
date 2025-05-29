@@ -71,8 +71,12 @@ button.grid(row=1, column=0, pady=10)
 timer_entry.bindtags(((str(timer_entry)), "Entry", "post-processing", ".", "all"))
 timer_entry.bind_class("post-processing", "<KeyPress>", timer_entry_manager.format_on_change)
 # Add callback for the Return key (Start/Stop timer)
-window.bind_all("<Return>", timer.start_stop)
-window.bind_all("<space>", timer.start_stop)
+window.unbind_all("<Return>")
+window.unbind_all("<space>")
+window.bind("<Return>", timer.start_stop)
+# "break" prevents further precessing of space bar by the button
+button.bind("<space>", lambda event: "break")
+timer_entry.bind("<space>", lambda event: "break")
 
 # Bring app back from minimized state
 window.createcommand('tk::mac::ReopenApplication', window.deiconify)
