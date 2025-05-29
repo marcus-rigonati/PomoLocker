@@ -62,13 +62,10 @@ class TimerEntryManager:
                 # Count colons before cursor in old vs new (approximate)
                 old_colons = current_content[:cursor_pos].count(':')
                 new_colons = formatted_str[:cursor_pos].count(':') # Approximate target area
-                # print(f"old_colons: {old_colons}")
-                # print(f"new_colons: {new_colons}")
                 diff_colons = new_colons - old_colons
                 new_cursor_pos += diff_colons
                 # Ensure cursor stays within bounds
                 new_cursor_pos = max(0, min(new_cursor_pos, len(formatted_str)))
-                # print(f"new_cursor_pos: {new_cursor_pos}")
                 self.timer_entry.icursor(new_cursor_pos)
             except Exception: # Fallback if index calculation fails
                 print(f"new_cursor_pos: Exception")

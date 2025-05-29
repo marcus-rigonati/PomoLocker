@@ -82,4 +82,5 @@ timer_entry.bind("<space>", lambda event: "break")
 window.createcommand('tk::mac::ReopenApplication', window.deiconify)
 
 # Start the Tkinter event loop (keeps the window open)
+timer_entry.focus_set()
 window.mainloop()
