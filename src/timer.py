@@ -14,7 +14,7 @@ class Timer:
         self.style = style
         self.button_text = button_text
         self.is_timer_running = False
-        self.after_id = None
+        self.next_count_down_call_id = None
         self.is_formatting = False
         self.remaining_seconds = timer_entry_manager.get_time_formatted()
 
@@ -25,6 +25,9 @@ class Timer:
         animate_bg_change(self.timer_entry, others_color, property_to_change="readonlybackground")
         animate_bg_change(self.window, others_color, self.style) # window is used just to schedule steps here
 
+    def countdown_loop_first_call(self):
+        self.next_count_down_call_id = self.window.after(1000, self.countdown_loop)
+
     def countdown_loop(self):
         if not self.is_timer_running:
             return
@@ -32,7 +35,7 @@ class Timer:
         if self.remaining_seconds > 0:
             self.remaining_seconds -= 1
             self.timer_entry_manager.safe_set(format_time(self.remaining_seconds))
-            self.after_id = self.window.after(1000, self.countdown_loop)
+            self.next_count_down_call_id = self.window.after(1000, self.countdown_loop)
         else:
             # Timer reached zero
             print("TIMER FINISHED!")
@@ -41,8 +44,8 @@ class Timer:
             focus_app()
             run_shell_command("/usr/bin/pmset displaysleepnow")
             self.is_timer_running = False
-            self.timer_entry.config(state='normal') # Make editable again
-            self.after_id = None
+            self.timer_entry.config(state='normal')
+            self.next_count_down_call_id = None
 
     def start_timer(self):
         if self.is_timer_running:
@@ -58,7 +61,7 @@ class Timer:
             self.change_background_colors("#474747", "#373737")
             self.button_text.set("Stop")
             print(f"Timer started from {format_time(self.remaining_seconds)}.")
-            self.countdown_loop() # Start the countdown
+            self.countdown_loop_first_call()
         elif current_seconds == 0:
             messagebox.showwarning("Timer Start", "Cannot start timer from 00:00:00.")
             self.timer_entry.focus_force()
@@ -69,9 +72,9 @@ class Timer:
             self.change_background_colors("#ad504d", "#b5625f")
             self.timer_entry.config(state='normal')
             self.button_text.set("Start")
-            if self.after_id:
-                self.window.after_cancel(self.after_id)
-                self.after_id = None
+            if self.next_count_down_call_id:
+                self.window.after_cancel(self.next_count_down_call_id)
+                self.next_count_down_call_id = None
         else:
             print("Timer is not running.")
 
