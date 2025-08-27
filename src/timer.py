@@ -61,6 +61,7 @@ class Timer:
             self.change_background_colors("#474747", "#373737")
             self.button_text.set("Stop")
             print(f"Timer started from {format_time(self.remaining_seconds)}.")
+            self.timer_entry_manager.safe_set(format_time(self.remaining_seconds))
             self.countdown_loop_first_call()
         elif current_seconds == 0:
             messagebox.showwarning("Timer Start", "Cannot start timer from 00:00:00.")
