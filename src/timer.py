@@ -1,6 +1,6 @@
 from text_handler import *
 from tkinter import messagebox
-from src.focus_manager import focus_app
+from focus_manager import focus_app
 from color_animation import animate_bg_change
 from run_shell_command import run_shell_command
 
