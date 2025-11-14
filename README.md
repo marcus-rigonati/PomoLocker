@@ -1,3 +1,6 @@
+<h1>PomoLocker</h1>
+<img src="./github/presentation.gif" width="657" height="640" />
+
 <h2>Description</h2>
 This is a project I created because I could not find a Pomodoro app that would lock my screen automatically once the timer's up, so here it
 is! <br />
