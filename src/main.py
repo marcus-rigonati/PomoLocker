@@ -41,6 +41,23 @@ timer_entry.grid(row=0, column=0, pady=10, padx=10)
 
 timer_entry_manager = TimerEntryManager(timer_var, timer_entry)
 
+# Footer
+footer_text = tkinter.StringVar(value="PomoLocker By Marcus Rigonati")
+footer_entry = tkinter.Entry(
+    window,
+    textvariable=footer_text,
+    font=('Helvetica', 10),
+    foreground='white', # Text color
+    justify='center',
+    state='readonly',
+    background=window.cget("bg"),
+    readonlybackground=window.cget("bg"),
+    borderwidth=0,
+    highlightthickness=0,
+    width=25,
+)
+footer_entry.grid(row=1, column=0, pady=10, padx=10)
+
 style = ttk.Style()
 style.theme_use('clam')
 style.configure(
@@ -58,11 +75,11 @@ style.map(
     background=[("active", "#be6b68")]
 )
 
-# --- Set Initial Display ---
+# Set Initial Display
 timer_entry_manager.safe_set(format_time(remaining_seconds))
 
 button_text = tkinter.StringVar(None, "Start")
-timer = Timer(window, parent_frame, timer_var, timer_entry, timer_entry_manager, button_text, style)
+timer = Timer(window, parent_frame, footer_entry, timer_var, timer_entry, timer_entry_manager, button_text, style)
 
 button = ttk.Button(parent_frame, textvariable=button_text, command=timer.start_stop, style='Red.TButton')
 button.grid(row=1, column=0, pady=10)

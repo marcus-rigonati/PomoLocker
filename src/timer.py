@@ -5,7 +5,7 @@ from color_animation import animate_bg_change
 from run_shell_command import run_shell_command
 
 class Timer:
-    def __init__(self, window, parent_frame, timer_var, timer_entry, timer_entry_manager, button_text, style):
+    def __init__(self, window, parent_frame, footer_entry, timer_var, timer_entry, timer_entry_manager, button_text, style):
         self.window = window
         self.parent_frame = parent_frame
         self.timer_var = timer_var
@@ -17,13 +17,15 @@ class Timer:
         self.next_count_down_call_id = None
         self.is_formatting = False
         self.remaining_seconds = timer_entry_manager.get_time_formatted()
+        self.footer_entry = footer_entry
 
-    def change_background_colors(self, window_color, others_color):
+    def change_background_colors(self, window_color, target_color):
         animate_bg_change(self.window, window_color)
-        animate_bg_change(self.parent_frame, others_color)
-        animate_bg_change(self.timer_entry, others_color)
-        animate_bg_change(self.timer_entry, others_color, property_to_change="readonlybackground")
-        animate_bg_change(self.window, others_color, self.style) # window is used just to schedule steps here
+        animate_bg_change(self.footer_entry, window_color, property_to_change="readonlybackground")
+        animate_bg_change(self.parent_frame, target_color)
+        animate_bg_change(self.timer_entry, target_color)
+        animate_bg_change(self.timer_entry, target_color, property_to_change="readonlybackground")
+        animate_bg_change(self.window, target_color, self.style) # window is used just to schedule steps here
 
     def countdown_loop_first_call(self):
         self.next_count_down_call_id = self.window.after(1000, self.countdown_loop)
