@@ -1,13 +1,20 @@
 import tkinter as tk
+from tkinter import ttk
+from typing import Optional
 
-def hex_to_rgb(hex_color):
+
+def hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
     """Converts a hex color string (e.g., '#RRGGBB') to an (R, G, B) tuple."""
     hex_color = hex_color.lstrip('#')
     if len(hex_color) != 6:
         raise ValueError("Invalid hex color format. Should be #RRGGBB or RRGGBB")
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
-def rgb_to_hex(rgb_tuple):
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    return r, g, b
+
+def rgb_to_hex(rgb_tuple: list[float]) -> str:
     """Converts an (R, G, B) tuple to a hex color string."""
     r, g, b = map(int, rgb_tuple) # Ensure components are integers
     r = max(0, min(255, r)) # Clamp values to 0-255
@@ -15,7 +22,7 @@ def rgb_to_hex(rgb_tuple):
     b = max(0, min(255, b))
     return f'#{r:02x}{g:02x}{b:02x}'
 
-def interpolate_color(start_color, end_color, fraction):
+def interpolate_color(start_color: str, end_color: str, fraction: float) -> str:
     """
     Linearly interpolates between two RGB colors.
     fraction is a float between 0.0 (start_color) and 1.0 (end_color).
@@ -29,7 +36,14 @@ def interpolate_color(start_color, end_color, fraction):
     ]
     return rgb_to_hex(interpolated_rgb)
 
-def animate_bg_change(widget, end_color, style=None, property_to_change="background", duration_ms=500, steps=25):
+def animate_bg_change(
+    widget: tk.Widget,
+    end_color: str,
+    style: Optional[ttk.Style] = None,
+    property_to_change: str = "background",
+    duration_ms: int = 500,
+    steps: int = 25
+) -> None:
     """
     Animates the background color of a widget.
 
@@ -47,13 +61,14 @@ def animate_bg_change(widget, end_color, style=None, property_to_change="backgro
     current_step = 0
     delay = duration_ms // steps # Time per step
 
-    def step_animation():
+    def animation_step() -> None:
         nonlocal current_step
         if current_step > steps:
+            # Ensures the final color is set
             if style is not None:
-                style.configure('Red.TButton', background=end_color) # Ensure final color is set
+                style.configure('Red.TButton', background=end_color)
             else:
-                widget[property_to_change] = end_color # Ensure final color is set
+                widget[property_to_change] = end_color
             return # Animation finished
 
         # Calculate the fraction of completion
@@ -64,7 +79,6 @@ def animate_bg_change(widget, end_color, style=None, property_to_change="backgro
 
         # Update the widget's background
         try:
-            # Check if widget still exists before configuring
             if widget.winfo_exists():
                 if style is not None:
                     style.configure('Red.TButton', background=new_color)
@@ -75,6 +89,6 @@ def animate_bg_change(widget, end_color, style=None, property_to_change="backgro
             return
 
         current_step += 1
-        widget.after(delay, step_animation)
+        widget.after(delay, animation_step)
 
-    step_animation()
+    animation_step()

@@ -1,9 +1,9 @@
-import tkinter as tk
 import subprocess
 import os
 import sys
 
-def focus_app():
+
+def focus_app() -> None:
     """
     Brings the current Python application to the foreground on macOS.
     (Implementation using AppleScript and PID - see previous answer)
