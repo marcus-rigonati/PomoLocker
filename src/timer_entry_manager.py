@@ -1,6 +1,8 @@
 import tkinter
 import re
+from typing import Optional
 from text_handler import parse_time_string
+
 
 class TimerEntryManager:
     def __init__(self, string_var: tkinter.StringVar, entry_widget: tkinter.Entry):
@@ -15,7 +17,7 @@ class TimerEntryManager:
         self.timer_entry = entry_widget
         self.is_formatting = False # Internal flag to prevent trace recursion
 
-    def format_on_change(self, *args):
+    def format_on_change(self, *args) -> None:
         """
         Called by StringVar trace whenever the Entry content changes.
         Formats the digits in the entry to HH:MM:SS style automatically.
@@ -52,28 +54,26 @@ class TimerEntryManager:
             # Store cursor position *before* setting the variable
             cursor_pos = self.timer_entry.index(tkinter.INSERT)
             self.timer_var.set(formatted_str)
-            # Try to restore cursor position (this is tricky with auto-format!)
-            # Adjusting based on added/removed colons can be complex.
-            # Setting to END is simpler, though might not be ideal UX.
+            # Try to restore cursor position
             try:
-                # Crude adjustment: if format added colons before cursor, shift right
-                # This is basic and may not cover all cases well.
+                # If format added colons before cursor, shift right
                 new_cursor_pos = cursor_pos
-                # Count colons before cursor in old vs new (approximate)
+                # Count colons before cursor in old vs new
                 old_colons = current_content[:cursor_pos].count(':')
                 new_colons = formatted_str[:cursor_pos].count(':') # Approximate target area
                 diff_colons = new_colons - old_colons
                 new_cursor_pos += diff_colons
-                # Ensure cursor stays within bounds
+                # Ensures the cursor stays within bounds
                 new_cursor_pos = max(0, min(new_cursor_pos, len(formatted_str)))
                 self.timer_entry.icursor(new_cursor_pos)
-            except Exception: # Fallback if index calculation fails
+            except Exception:
+                # Fallback if index calculation fails
                 print(f"new_cursor_pos: Exception")
                 self.timer_entry.icursor(tkinter.END)
 
         self.is_formatting = False
 
-    def safe_set(self, value):
+    def safe_set(self, value: str) -> None:
         """
         Programmatically sets the StringVar's value, bypassing the
         formatting logic temporarily to avoid interference or loops.
@@ -86,11 +86,11 @@ class TimerEntryManager:
             self.timer_var.set(value)
             self.is_formatting = False
 
-    def format_now(self):
+    def format_now(self) -> None:
         """ Manually triggers the formatting logic once. """
         self.format_on_change()
 
-    def get_time_formatted(self):
+    def get_time_formatted(self) -> Optional[int]:
         self.format_now()
         result = self.timer_var.get()
         return parse_time_string(result)
