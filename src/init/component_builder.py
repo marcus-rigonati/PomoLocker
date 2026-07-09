@@ -1,9 +1,9 @@
 import tkinter
 from tkinter import Tk, Frame, ttk
 
-from src.constants import WINDOW_BG_COLOR, FRAME_BG_COLOR, BUTTON_ACTIVE_COLOR
-from src.init.ui_components import UIComponents
-from src.timer import Timer
+from constants import WINDOW_BG_COLOR, FRAME_BG_COLOR, BUTTON_ACTIVE_COLOR
+from init.ui_components import UIComponents
+from timer import Timer
 
 
 def create_main_window() -> Tk:

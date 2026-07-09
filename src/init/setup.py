@@ -1,7 +1,7 @@
 from tkinter import Tk, Entry
 from typing import Any
-from src.timer import Timer
-from src.timer_entry_manager import TimerEntryManager
+from timer import Timer
+from timer_entry_manager import TimerEntryManager
 
 
 def setup_timer_entry_bindings(timer_entry: Entry, timer_entry_manager: TimerEntryManager):
