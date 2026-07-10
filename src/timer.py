@@ -1,14 +1,13 @@
 import text_handler
 from tkinter import messagebox
-from focus_manager import focus_app
 from color_animation import animate_bg_change
-from run_shell_command import run_shell_command
 from init.ui_components import UIComponents
+from platforms.base import Platform
 from timer_entry_manager import TimerEntryManager
 
 
 class Timer:
-    def __init__(self, ui_components: UIComponents, timer_entry_manager: TimerEntryManager):
+    def __init__(self, ui_components: UIComponents, timer_entry_manager: TimerEntryManager, platform: Platform):
         self.window = ui_components.window
         self.parent_frame = ui_components.parent_frame
         self.timer_var = ui_components.timer_var
@@ -17,6 +16,7 @@ class Timer:
         self.style = ui_components.style
         self.button_text = ui_components.button_text
         self.timer_entry_manager = timer_entry_manager
+        self.platform = platform
         self.is_timer_running = False
         self.next_count_down_call_id = None
         self.is_formatting = False
@@ -45,8 +45,8 @@ class Timer:
             print("Timer Finished!")
             self.change_background_colors("#ad504d", "#b5625f")
             self.window.deiconify()
-            focus_app()
-            run_shell_command("/usr/bin/pmset displaysleepnow")
+            self.platform.focus_app(self.window)
+            self.platform.lock_screen()
             self.is_timer_running = False
             self.timer_entry.config(state='normal')
             self.next_count_down_call_id = None

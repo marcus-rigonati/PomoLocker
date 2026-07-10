@@ -20,7 +20,3 @@ def setup_keyboard_shortcuts(window: Tk, timer_entry: Entry, timer: Timer):
         return "break"
 
     timer_entry.bind("<space>", custom_on_press_space)
-
-def setup_mac_specific(window: Tk):
-    """Bring app back from minimized state."""
-    window.createcommand('tk::mac::ReopenApplication', window.deiconify)
