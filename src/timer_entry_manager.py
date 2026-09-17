@@ -1,96 +1,80 @@
-import tkinter
 import re
-from typing import Optional
+
+from PySide6.QtWidgets import QLineEdit
+
 from text_handler import parse_time_string
 
 
 class TimerEntryManager:
-    def __init__(self, string_var: tkinter.StringVar, entry_widget: tkinter.Entry):
+    def __init__(self, timer_entry: QLineEdit) -> None:
         """
         Initialize the formatter.
 
         Args:
-            string_var: The tk.StringVar linked to the Entry.
-            entry_widget: The tk.Entry widget itself.
+            timer_entry: The QLineEdit holding the timer text.
+                Signals are not connected here (see init/setup.py).
         """
-        self.timer_var = string_var
-        self.timer_entry = entry_widget
-        self.is_formatting = False # Internal flag to prevent trace recursion
+        self.timer_entry = timer_entry
 
-    def format_on_change(self, *args) -> None:
+    def format_on_change(self, _: str | None = None) -> None:
         """
-        Called by StringVar trace whenever the Entry content changes.
+        Slot for QLineEdit.textEdited.
         Formats the digits in the entry to HH:MM:SS style automatically.
         """
-        if self.is_formatting: # Prevent recursive calls
-            return
-
-        self.is_formatting = True
-
-        current_content = self.timer_var.get()
-        # Extract digits, removing any existing formatting or non-digits
-        digits = re.sub(r'\D', '', current_content)
-
-        # Limit to max 6 digits
+        current_content = self.timer_entry.text()
+        # Extract digits, removing any existing formatting or non-digits and limit to max 6 digits
+        digits = re.sub(r"\D", "", current_content)
         digits = digits[:6]
 
-        # Build the formatted string
         formatted_str = ""
         len_digits = len(digits)
 
-        if len_digits == 6: # HH:MM:SS
+        if len_digits == 6:  # HH:MM:SS
             formatted_str = f"{digits[:2]}:{digits[2:4]}:{digits[4:]}"
-        elif len_digits == 5: # H:MM:SS
+        elif len_digits == 5:  # H:MM:SS
             formatted_str = f"{digits[:1]}:{digits[1:3]}:{digits[3:]}"
-        elif len_digits == 4: # MM:SS
+        elif len_digits == 4:  # MM:SS
             formatted_str = f"{digits[:2]}:{digits[2:]}"
-        elif len_digits == 3: # M:SS
+        elif len_digits == 3:  # M:SS
             formatted_str = f"{digits[:1]}:{digits[1:]}"
-        else: # S or SS or empty
+        else:  # S or SS or empty
             formatted_str = digits
 
-        # Update the entry only if the formatted string is different
-        if self.timer_var.get() != formatted_str:
-            # Store cursor position *before* setting the variable
-            cursor_pos = self.timer_entry.index(tkinter.INSERT)
-            self.timer_var.set(formatted_str)
-            # Try to restore cursor position
+        if current_content != formatted_str:
+            # Get cursor position *before* setting the text (setText moves it to the end)
+            cursor_pos = self.timer_entry.cursorPosition()
+            self.timer_entry.setText(formatted_str)
+
             try:
                 # If format added colons before cursor, shift right
                 new_cursor_pos = cursor_pos
-                # Count colons before cursor in old vs new
-                old_colons = current_content[:cursor_pos].count(':')
-                new_colons = formatted_str[:cursor_pos].count(':') # Approximate target area
+
+                old_colons = current_content[:cursor_pos].count(":")
+                new_colons = formatted_str[:cursor_pos].count(":")
                 diff_colons = new_colons - old_colons
+
                 new_cursor_pos += diff_colons
+
                 # Ensures the cursor stays within bounds
                 new_cursor_pos = max(0, min(new_cursor_pos, len(formatted_str)))
-                self.timer_entry.icursor(new_cursor_pos)
-            except Exception:
+                self.timer_entry.setCursorPosition(new_cursor_pos)
+            except Exception as e:
                 # Fallback if index calculation fails
-                print(f"new_cursor_pos: Exception")
-                self.timer_entry.icursor(tkinter.END)
-
-        self.is_formatting = False
+                print(f"new_cursor_pos: Exception {e}")
+                self.timer_entry.end(False)
 
     def safe_set(self, value: str) -> None:
         """
-        Programmatically sets the StringVar's value, bypassing the
-        formatting logic temporarily to avoid interference or loops.
+        Programmatically sets the entry text. setText() does not emit
+        textEdited, so the formatting logic is not triggered.
         """
-        if self.is_formatting:
-            # Avoid setting if formatting is already in progress
-            print("Warning: safe_set called while formatting was in progress.")
-        else:
-            self.is_formatting = True
-            self.timer_var.set(value)
-            self.is_formatting = False
+        self.timer_entry.setText(value)
 
     def format_now(self) -> None:
-        """ Manually triggers the formatting logic once. """
+        """Manually triggers the formatting logic once."""
         self.format_on_change()
 
-    def get_time_formatted(self) -> Optional[int]:
+    def get_time_formatted(self) -> int | None:
         self.format_now()
-        result = self.timer_var.get()
+        result = self.timer_entry.text()
         return parse_time_string(result)
