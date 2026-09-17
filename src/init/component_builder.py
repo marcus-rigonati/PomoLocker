@@ -1,96 +1,115 @@
-import tkinter
-from tkinter import Tk, Frame, ttk
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QFrame,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
-from constants import WINDOW_BG_COLOR, FRAME_BG_COLOR, BUTTON_ACTIVE_COLOR
+from color_animation import ThemeAnimator
+from constants import (
+    BUTTON_OBJECT_NAME,
+    FOOTER_OBJECT_NAME,
+    FRAME_OBJECT_NAME,
+    TIMER_ENTRY_OBJECT_NAME,
+    WINDOW_OBJECT_NAME,
+)
 from init.ui_components import UIComponents
-from timer import Timer
+
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 200
+PADDING = 10
+TIMER_ENTRY_WIDTH_CHARS = 10
+FOOTER_TEXT = "PomoLocker By Marcus Rigonati"
 
 
-def create_main_window() -> Tk:
-    window = Tk()
-    window.geometry("400x200")
-    window.resizable(True, True)
-    window.minsize(400, 200)
-    window.grid_rowconfigure(0, weight=1)
-    window.grid_columnconfigure(0, weight=1)
-    window.title("PomoLocker")
-    window.config(background=WINDOW_BG_COLOR)
-    return window
+def create_main_window() -> tuple[QWidget, QGridLayout]:
+    """Creates the resizable top-level window with a two-row grid layout."""
+    window = QWidget()
+    window.setObjectName(WINDOW_OBJECT_NAME)
+    window.setWindowTitle("PomoLocker")
+    window.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
+    window.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT)
 
-def create_parent_frame(window: Tk) -> Frame:
-    parent_frame = Frame(window, pady=10, background=FRAME_BG_COLOR)
-    parent_frame.grid(row=0, column=0)
-    return parent_frame
+    layout = QGridLayout(window)
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.setSpacing(0)
 
-def create_timer_entry(parent_frame: Frame) -> tuple[tkinter.StringVar, tkinter.Entry]:
-    timer_var = tkinter.StringVar()
-    timer_entry = tkinter.Entry(
-        parent_frame,
-        textvariable=timer_var,
-        font=('Helvetica', 24),
-        foreground='white',
-        justify='center',
-        state='normal',
-        background=parent_frame.cget("bg"),
-        readonlybackground=parent_frame.cget("bg"),
-        borderwidth=0,
-        highlightthickness=0,
-    )
-    timer_entry.grid(row=0, column=0, pady=10, padx=10)
-    return timer_var, timer_entry
+    layout.setRowStretch(0, 1)
+    layout.setColumnStretch(0, 1)
+    return window, layout
 
-def create_footer(window: Tk) -> tkinter.Entry:
-    footer_text = tkinter.StringVar(value="PomoLocker By Marcus Rigonati")
-    footer_entry = tkinter.Entry(
-        window,
-        textvariable=footer_text,
-        font=('Helvetica', 10),
-        foreground='white',
-        justify='center',
-        state='readonly',
-        background=window.cget("bg"),
-        readonlybackground=window.cget("bg"),
-        borderwidth=0,
-        highlightthickness=0,
-        width=25,
-    )
-    footer_entry.grid(row=1, column=0, pady=10, padx=10)
-    return footer_entry
 
-def configure_button_style(parent_frame: Frame) -> ttk.Style:
-    style = ttk.Style()
-    style.theme_use('clam')
-    style.configure(
-        "Red.TButton",
-        background=parent_frame.cget("bg"),
-        foreground='white',
-        borderwidth=1,
-        font=('Arial', 12, "bold"),
-        bordercolor='white',
-        focusthickness=0,
-        focuscolor='none',
-    )
-    style.map(
-        "Red.TButton",
-        background=[("active", BUTTON_ACTIVE_COLOR)]
-    )
-    return style
+def create_parent_frame(
+    window: QWidget, layout: QGridLayout
+) -> tuple[QFrame, QVBoxLayout]:
+    """Creates the frame holding the timer entry and button, centered and sized to its content."""
+    parent_frame = QFrame(window)
+    parent_frame.setObjectName(FRAME_OBJECT_NAME)
 
-def create_start_stop_button(parent_frame: Frame, button_text: tkinter.StringVar, timer: Timer) -> ttk.Button:
-    button = ttk.Button(
-        parent_frame,
-        textvariable=button_text,
-        command=timer.start_stop,
-        style='Red.TButton'
-    )
-    button.grid(row=1, column=0, pady=10)
+    frame_layout = QVBoxLayout(parent_frame)
+    frame_layout.setContentsMargins(PADDING, PADDING, PADDING, PADDING)
+    frame_layout.setSpacing(PADDING)
+
+    layout.addWidget(parent_frame, 0, 0, Qt.AlignmentFlag.AlignCenter)
+    return parent_frame, frame_layout
+
+
+def create_timer_entry(parent_frame: QFrame, frame_layout: QVBoxLayout) -> QLineEdit:
+    """Creates the entry for HH:MM:SS."""
+    timer_entry = QLineEdit(parent_frame)
+    timer_entry.setObjectName(TIMER_ENTRY_OBJECT_NAME)
+    timer_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    timer_entry.setMaxLength(8)
+    timer_entry.setFrame(False)
+    frame_layout.addWidget(timer_entry)
+    return timer_entry
+
+
+def create_start_stop_button(
+    parent_frame: QFrame, frame_layout: QVBoxLayout
+) -> QPushButton:
+    """Creates the Start/Stop button; its clicked signal is connected in setup.py."""
+    button = QPushButton("Start", parent_frame)
+    button.setObjectName(BUTTON_OBJECT_NAME)
+    frame_layout.addWidget(button, 0, Qt.AlignmentFlag.AlignHCenter)
     return button
 
+
+def create_footer(window: QWidget, layout: QGridLayout) -> QLabel:
+    """Creates the footer label at the bottom of the window."""
+    footer_label = QLabel(FOOTER_TEXT, window)
+    footer_label.setObjectName(FOOTER_OBJECT_NAME)
+    footer_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    footer_label.setContentsMargins(PADDING, PADDING, PADDING, PADDING)
+    layout.addWidget(
+        footer_label, 1, 0, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom
+    )
+    return footer_label
+
+
+def size_timer_entry(timer_entry: QLineEdit) -> None:
+    """Makes the entry wide enough for "00:00:00" with spare room, using the stylesheet font."""
+    timer_entry.ensurePolished()
+    text_width = timer_entry.fontMetrics().horizontalAdvance(
+        "0" * TIMER_ENTRY_WIDTH_CHARS
+    )
+    margins = timer_entry.textMargins()
+    timer_entry.setMinimumWidth(text_width + margins.left() + margins.right())
+
+
 def create_ui_components() -> UIComponents:
-    window = create_main_window()
-    parent_frame = create_parent_frame(window)
-    timer_var, timer_entry = create_timer_entry(parent_frame)
-    footer_entry = create_footer(window)
-    style = configure_button_style(parent_frame)
-    button_text = tkinter.StringVar(None, "Start")
-    return UIComponents(window, parent_frame, timer_var, timer_entry, footer_entry, style, button_text)
+    """Builds the main window and all its widgets. Requires an existing QApplication."""
+    window, layout = create_main_window()
+    parent_frame, frame_layout = create_parent_frame(window, layout)
+    timer_entry = create_timer_entry(parent_frame, frame_layout)
+    start_stop_button = create_start_stop_button(parent_frame, frame_layout)
+    footer_label = create_footer(window, layout)
+    theme = ThemeAnimator(window)
+    size_timer_entry(timer_entry)
+    return UIComponents(
+        window, parent_frame, timer_entry, start_stop_button, footer_label, theme
+    )

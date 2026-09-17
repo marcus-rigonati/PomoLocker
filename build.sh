@@ -60,6 +60,7 @@ args=(
     --distpath "$ROOT/dist"
     --workpath "$ROOT/build"
     --specpath "$ROOT/build"
+    --exclude-module tkinter
 )
 
 case "$OS" in
@@ -68,7 +69,7 @@ case "$OS" in
         args+=(--icon "$ROOT/appicon.icns" --osx-bundle-identifier "$BUNDLE_ID")
         ;;
     linux)
-        # PyInstaller has to find libpython/libtk to copy them into the binary.
+        # PyInstaller has to find libpython to copy them into the binary.
         PY_LIB="$("$PYTHON" -c 'import os, sys; print(os.path.join(sys.base_prefix, "lib"))')"
         export LD_LIBRARY_PATH="$PY_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
         args+=(--onefile)

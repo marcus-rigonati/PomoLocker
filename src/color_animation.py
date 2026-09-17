@@ -1,94 +1,132 @@
-import tkinter as tk
-from tkinter import ttk
-from typing import Optional
+from PySide6.QtCore import QObject, Qt, QVariantAnimation
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QWidget
 
+from constants import (
+    BUTTON_OBJECT_NAME,
+    FOOTER_OBJECT_NAME,
+    FRAME_BG_COLOR,
+    FRAME_OBJECT_NAME,
+    TIMER_ENTRY_OBJECT_NAME,
+    WINDOW_BG_COLOR,
+    WINDOW_OBJECT_NAME,
+)
 
-def hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
-    """Converts a hex color string (e.g., '#RRGGBB') to an (R, G, B) tuple."""
-    hex_color = hex_color.lstrip('#')
-    if len(hex_color) != 6:
-        raise ValueError("Invalid hex color format. Should be #RRGGBB or RRGGBB")
+TEXT_COLOR = "#ffffff"
+COLOR_ANIMATION_MS = 500
+BUTTON_ACTIVE_COLOR = "#be6b68"  # button hover/pressed, in every state
 
-    r = int(hex_color[0:2], 16)
-    g = int(hex_color[2:4], 16)
-    b = int(hex_color[4:6], 16)
-    return r, g, b
-
-def rgb_to_hex(rgb_tuple: list[float]) -> str:
-    """Converts an (R, G, B) tuple to a hex color string."""
-    r, g, b = map(int, rgb_tuple) # Ensure components are integers
-    r = max(0, min(255, r)) # Clamp values to 0-255
-    g = max(0, min(255, g))
-    b = max(0, min(255, b))
-    return f'#{r:02x}{g:02x}{b:02x}'
 
 def interpolate_color(start_color: str, end_color: str, fraction: float) -> str:
     """
-    Linearly interpolates between two RGB colors.
-    fraction is a float between 0.0 (start_color) and 1.0 (end_color).
+    Linearly interpolates between two hex colors. Fraction is a float between 0.0 (start_color) and 1.0 (end_color).
     """
-    start_rgb = hex_to_rgb(start_color)
-    end_rgb = hex_to_rgb(end_color)
+    fraction = max(0.0, min(1.0, fraction))
+    start = QColor(start_color)
+    end = QColor(end_color)
+    r = round(start.red() + (end.red() - start.red()) * fraction)
+    g = round(start.green() + (end.green() - start.green()) * fraction)
+    b = round(start.blue() + (end.blue() - start.blue()) * fraction)
+    return f"#{r:02x}{g:02x}{b:02x}"
 
-    interpolated_rgb = [
-        start + (end - start) * fraction
-        for start, end in zip(start_rgb, end_rgb)
-    ]
-    return rgb_to_hex(interpolated_rgb)
 
-def animate_bg_change(
-    widget: tk.Widget,
-    end_color: str,
-    style: Optional[ttk.Style] = None,
-    property_to_change: str = "background",
-    duration_ms: int = 500,
-    steps: int = 25
-) -> None:
-    """
-    Animates the background color of a widget.
+def build_stylesheet(window_bg: str, frame_bg: str) -> str:
+    """Builds the application stylesheet for the given window and frame background colors. Kinda like CSS."""
+    return f"""
+QWidget#{WINDOW_OBJECT_NAME} {{
+    background-color: {window_bg};
+}}
+QFrame#{FRAME_OBJECT_NAME} {{
+    background-color: {frame_bg};
+    border: none;
+}}
+QLineEdit#{TIMER_ENTRY_OBJECT_NAME}, QLineEdit#{TIMER_ENTRY_OBJECT_NAME}[readOnly="true"] {{
+    background-color: {frame_bg};
+    color: {TEXT_COLOR};
+    border: none;
+    font-size: 24pt;
+    font-family: "Helvetica", "Arial", sans-serif;
+}}
+QPushButton#{BUTTON_OBJECT_NAME} {{
+    background-color: {frame_bg};
+    color: {TEXT_COLOR};
+    border: 1px solid white;
+    font-weight: bold;
+    font-size: 12pt;
+    font-family: "Arial", "Helvetica", sans-serif;
+    padding: 4px 16px;
+    outline: none;
+}}
+QPushButton#{BUTTON_OBJECT_NAME}:hover, QPushButton#{BUTTON_OBJECT_NAME}:pressed {{
+    background-color: {BUTTON_ACTIVE_COLOR};
+}}
+QLabel#{FOOTER_OBJECT_NAME} {{
+    color: {TEXT_COLOR};
+    background: transparent;
+    font-size: 10pt;
+    font-family: "Helvetica", "Arial", sans-serif;
+}}
+"""
 
-    Args:
-        widget: The Tkinter widget to animate.
-        end_color: The ending hex color string (e.g., '#0000FF').
-        property_to_change: the name of the widget property that should be changed (default: "background")
-        duration_ms: Total duration of the animation in milliseconds.
-        steps: Number of intermediate steps in the animation.
-    """
-    if style is not None:
-        start_color = style.lookup('Red.TButton', property_to_change)
-    else:
-        start_color = widget.cget('bg')
-    current_step = 0
-    delay = duration_ms // steps # Time per step
 
-    def animation_step() -> None:
-        nonlocal current_step
-        if current_step > steps:
-            # Ensures the final color is set
-            if style is not None:
-                style.configure('Red.TButton', background=end_color)
-            else:
-                widget[property_to_change] = end_color
-            return # Animation finished
+class ThemeAnimator(QObject):
+    """Applies the app stylesheet to a window and tweens its two background colors."""
 
-        # Calculate the fraction of completion
-        fraction = current_step / steps
+    def __init__(
+        self,
+        window: QWidget,
+        window_bg: str = WINDOW_BG_COLOR,
+        frame_bg: str = FRAME_BG_COLOR,
+    ) -> None:
+        super().__init__(window)
+        self.window = window
+        self.window_bg = window_bg
+        self.frame_bg = frame_bg
+        self._start_colors = (window_bg, frame_bg)
+        self._end_colors = (window_bg, frame_bg)
 
-        # Calculate the intermediate color
-        new_color = interpolate_color(start_color, end_color, fraction)
+        # A plain top-level QWidget only paints stylesheet backgrounds with this attribute
+        self.window.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
-        # Update the widget's background
-        try:
-            if widget.winfo_exists():
-                if style is not None:
-                    style.configure('Red.TButton', background=new_color)
-                else:
-                    widget[property_to_change]=new_color
-        except tk.TclError:
-            print(f"Warning: Widget {widget} destroyed during animation.")
-            return
+        self.animation = QVariantAnimation(self)
+        self.animation.setStartValue(0.0)
+        self.animation.setEndValue(1.0)
+        self.animation.valueChanged.connect(self._on_step)
+        self.animation.finished.connect(self._on_finished)
 
-        current_step += 1
-        widget.after(delay, animation_step)
+        self._apply(window_bg, frame_bg)
 
-    animation_step()
+    def animate_to(
+        self,
+        target_window_bg: str,
+        target_frame_bg: str,
+        duration_ms: int = COLOR_ANIMATION_MS,
+    ) -> None:
+        """Interrupts any running animation and tweens from the current colors to the given ones."""
+        self.animation.stop()
+        self._start_colors = (self.window_bg, self.frame_bg)
+        self._end_colors = (target_window_bg, target_frame_bg)
+
+        if duration_ms > 0:
+            self.animation.setDuration(duration_ms)
+            self.animation.start()
+        else:
+            self._on_finished()
+
+    def _on_step(self, fraction: float) -> None:
+        """Applies the interpolated colors for the given animation progress."""
+        if self.animation.state() == QVariantAnimation.State.Running:
+            self._apply(
+                interpolate_color(self._start_colors[0], self._end_colors[0], fraction),
+                interpolate_color(self._start_colors[1], self._end_colors[1], fraction),
+            )
+
+    def _on_finished(self) -> None:
+        """Ensures the final colors are set exactly."""
+        self._apply(*self._end_colors)
+
+    def _apply(self, window_bg: str, frame_bg: str) -> None:
+        """Stores the current colors and re-applies the stylesheet to the window."""
+        self.window_bg = window_bg
+        self.frame_bg = frame_bg
+        self.window.setStyleSheet(build_stylesheet(window_bg, frame_bg))
