@@ -11,6 +11,7 @@ APP_NAME = "PomoLocker"
 DATA_FILES = []
 
 OPTIONS = {
+    'packages': ['platforms'],
     'excludes': ['setuptools', 'macholib', 'modulegraph'],
     'argv_emulation': False,
     'iconfile': 'appicon.icns',

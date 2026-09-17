@@ -1,3 +1,9 @@
 packaging==24.2
-py2app==0.28.8
 setuptools==78.1.0
+
+# PyInstaller drives build.sh on every platform. py2app is the macOS-only
+# `python setup.py py2app` path; pillow only exists to convert the .png icon
+# into a Windows .ico at build time.
+pyinstaller==6.21.0
+py2app==0.28.8; sys_platform == "darwin"
+pillow==11.3.0; sys_platform == "win32"

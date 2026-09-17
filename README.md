@@ -11,26 +11,23 @@ the app free! <br />
 I use this app daily so I will probably keep it updated, but I can't promise anything.
 
 <h2>Building the App</h2>
-To build this app you must have Python installed, version 3.13.5 or later (I have tried older versions, and it did not work), and MacOS
-Sequoia 15.6.1 or later.
+To build this app you must have Python installed, version 3.13.5 or later (I have tried older versions, and it did not work).
 
 All you have to do is clone the repository and run the following commands: <br />
 ```
-python3.13 -m venv venv
-source venv/bin/activate
+python3.13 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-python setup.py py2app
+./build.sh
 ```
-After everything is done, you should be able to find the app in the dist folder inside the project, you can move it to your `~/Applications`
-folder for example.
+`build.sh` detects the OS it is running on and produces a `.app` bundle on macOS and a single-file executable on Linux and
+Windows, both in the `dist` folder.
+```
 
 <h2>Compatibility</h2>
 <ul>
-  <li>MacOS Sequoia 15.6.1</li>
-  <li>Python 3.13.5 (I have tried older versions, and it did not work)</li>
+  <li>MacOS Sequoia 15.6.1 or later</li>
+  <li>Linux with GNOME, KDE or Hyprland (Hyprland needs <code>hyprlock</code> installed)</li>
+  <li>Windows 10 or later</li>
 </ul>
 
-<h2>Plans for the Future</h2>
-I want to make the icon look better but so far I wasn't able to figure it out how to do it. For some reason, it is bigger than other app
-icons. <br /> 
-I would like to make this app work on Linux and Windows as well, but nothing has been done on this topic yet.
