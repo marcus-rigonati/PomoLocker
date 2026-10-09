@@ -57,6 +57,7 @@ args=(
     --windowed
     --paths "$ROOT/src"
     --collect-submodules platforms
+    --collect-submodules desktop_notifier
     --distpath "$ROOT/dist"
     --workpath "$ROOT/build"
     --specpath "$ROOT/build"
