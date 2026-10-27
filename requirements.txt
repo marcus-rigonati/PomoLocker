@@ -3,7 +3,7 @@ setuptools==78.1.0
 
 # PyInstaller drives build.sh on every platform; pillow only exists to convert
 # the .png icon into a Windows .ico at build time.
-PySide6-Essentials==6.11.2
+PySide6-Essentials==6.12.0
 pyinstaller==6.21.0
 pillow==11.3.0; sys_platform == "win32"
 desktop-notifier==6.2.0
