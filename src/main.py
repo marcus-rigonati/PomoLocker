@@ -1,6 +1,8 @@
+import asyncio
 import sys
 
 from PySide6.QtWidgets import QApplication
+from qasync import QEventLoop
 
 import text_handler
 from init.component_builder import create_ui_components
@@ -20,6 +22,11 @@ def main() -> None:
     app = QApplication(sys.argv)
     app.setApplicationName("PomoLocker")
 
+    # qasync runs asyncio on top of Qt's event loop, so coroutines such as
+    # desktop-notifier's send() can be scheduled from Qt slots.
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
     ui_components = create_ui_components()
     window = ui_components.window
     platform = get_platform()
@@ -37,7 +44,10 @@ def main() -> None:
     # Start the application
     window.show()
     ui_components.timer_entry.setFocus()
-    sys.exit(app.exec())
+    # run_forever() runs app.exec() with this loop marked as the running
+    # asyncio loop, and returns Qt's exit code.
+    with loop:
+        sys.exit(loop.run_forever())
 
 
 if __name__ == "__main__":
