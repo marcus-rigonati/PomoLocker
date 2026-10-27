@@ -47,6 +47,10 @@ esac
 
 TARGET="$APP_NAME-$OS-$ARCH"
 
+# Fix for Windows paths
+DATA_ROOT="$ROOT"
+[[ "$OS" == windows ]] && DATA_ROOT="$(cygpath -m "$ROOT")"
+
 # src/ uses flat imports (`import text_handler`), so it has to be on the search
 # path. platforms/ picks its implementation lazily inside get_platform(), so its
 # submodules are collected explicitly rather than left to static analysis.
@@ -58,6 +62,7 @@ args=(
     --paths "$ROOT/src"
     --collect-submodules platforms
     --collect-submodules desktop_notifier
+    --add-data "$DATA_ROOT/icon/notification-icon.png:icon"
     --distpath "$ROOT/dist"
     --workpath "$ROOT/build"
     --specpath "$ROOT/build"

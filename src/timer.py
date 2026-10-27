@@ -1,11 +1,12 @@
 import asyncio
 
-from desktop_notifier import DesktopNotifier
+from desktop_notifier import DEFAULT_SOUND, DesktopNotifier, Icon
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QMessageBox
 
 import text_handler
 from constants import (
+    APP_ICON_PATH,
     FRAME_BG_COLOR,
     WINDOW_BG_COLOR,
 )
@@ -39,6 +40,9 @@ class Timer:
         self.countdown_timer = QTimer(self.window)
         self.countdown_timer.setInterval(1000)
         self.countdown_timer.timeout.connect(self.countdown_loop)
+        self.notifier = DesktopNotifier(
+            app_name="PomoLocker", app_icon=Icon(path=APP_ICON_PATH)
+        )
         self.notifier = DesktopNotifier(app_name="PomoLocker")
         # holding ref until is finishes because asyncio only keeps weak refs
         self.notification_task: asyncio.Task | None = None
@@ -47,6 +51,7 @@ class Timer:
         await self.notifier.send(
             title="PomoLocker",
             message="Your screen will lock in 5 seconds.",
+            sound=DEFAULT_SOUND,
             on_clicked=self.bring_window_to_front,
         )
 
@@ -77,6 +82,7 @@ class Timer:
             print("Timer Finished!")
             self.theme.animate_to(WINDOW_BG_COLOR, FRAME_BG_COLOR)
             self.bring_window_to_front()
+            self.platform.focus_app(self.window)
             self.platform.lock_screen()
             self.is_timer_running = False
             self.timer_entry.setReadOnly(False)
